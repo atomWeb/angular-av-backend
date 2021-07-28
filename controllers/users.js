@@ -4,16 +4,30 @@ const User = require("../models/user");
 const { generateJwt } = require("../helpers/jwt");
 
 const getUsers = async (req, res) => {
-  const users = await User.find({}, "username email role");
+  const tokenpag = Number(req.query.tokenpag) || 0;
+
+  // const users = await User.find({}, "username email role")
+  //                         .skip(tokenpag)
+  //                         .limit(5);
+
+  // const total = await User.countDocuments();
+
+  const [users, total] = await Promise.all([
+    User.find({}, "username email role")
+        .skip(tokenpag)
+        .limit(5),
+    User.countDocuments()
+  ]);
 
   res.json({
     ok: true,
     users,
+    total,
     // uid: req.uid // Muestra el usuario que ha hecho la peticion
   });
 };
 
-const createUsers = async (req, res = response) => {
+const createUser = async (req, res = response) => {
   const { username, email, password } = req.body;
   try {
     const checkIfEmail = await User.findOne({ email });
@@ -37,7 +51,7 @@ const createUsers = async (req, res = response) => {
     res.json({
       ok: true,
       user,
-      token
+      token,
     });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
@@ -48,7 +62,7 @@ const updateUser = async (req, res = response) => {
   try {
     const uid = req.params.id;
 
-    const checkIfUser = await User.findById( uid );
+    const checkIfUser = await User.findById(uid);
     if (!checkIfUser) {
       return res.status(404).json({
         ok: false,
@@ -84,7 +98,7 @@ const deleteUser = async (req, res = response) => {
   try {
     const uid = req.params.id;
 
-    const checkIfUser = await User.findById( uid );
+    const checkIfUser = await User.findById(uid);
     if (!checkIfUser) {
       return res.status(404).json({
         ok: false,
@@ -92,13 +106,12 @@ const deleteUser = async (req, res = response) => {
       });
     }
 
-    await User.findByIdAndDelete( uid );
+    await User.findByIdAndDelete(uid);
 
     res.json({
       ok: true,
-      msg: "Usuario eliminado correctamente.",
+      data: "Usuario eliminado correctamente.",
     });
-    
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
@@ -106,7 +119,7 @@ const deleteUser = async (req, res = response) => {
 
 module.exports = {
   getUsers: getUsers,
-  createUsers: createUsers,
+  createUser: createUser,
   updateUser: updateUser,
   deleteUser: deleteUser,
 };

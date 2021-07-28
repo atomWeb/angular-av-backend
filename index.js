@@ -19,7 +19,11 @@ dbConnection();
 
 // Rutas
 app.use("/api/users", require("./routes/users"));
+app.use("/api/hospitals", require("./routes/hospitals"));
+app.use("/api/doctors", require("./routes/doctors"));
 app.use("/api/login", require("./routes/auth"));
+app.use("/api/all", require("./routes/searches"));
+app.use("/api/uploads", require("./routes/uploads"));
 
 app.listen(process.env.PORT, () => {
   console.log("Api run on port ", process.env.PORT);

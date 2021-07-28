@@ -27,7 +27,7 @@ const login = async (req, res = response) => {
   try {
     res.json({
       ok: true,
-      msg: token,
+      data: token,
     });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
