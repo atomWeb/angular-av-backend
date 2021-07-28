@@ -9,17 +9,18 @@ const { dbConnection } = require("./database/config");
 const app = express();
 
 // CORS Config
-app.use(cors);
+app.use(cors());
+
+// http Body reader and parser
+app.use(express.json());
 
 // Database
 dbConnection();
 
 // Rutas
-app.get("/", (req, res) => {
-  res.json({
-    ok: true,
-    msg: "Hola mundo",
-  });
-});
+app.use("/api/users", require("./routes/users"));
+app.use("/api/login", require("./routes/auth"));
 
-app.listen(process.env.PORT, () => {});
+app.listen(process.env.PORT, () => {
+  console.log("Api run on port ", process.env.PORT);
+});
