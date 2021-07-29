@@ -68,7 +68,22 @@ const googleSignIn = async (req, res = response) => {
   }
 };
 
+const renewToken = async (req, res = response) => {
+  try {
+    const uid = req.uid;
+    const token = await generateJwt(uid);
+    res.json({
+      ok: true,
+      data: token,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(401).json({ ok: false, error: "Usuario no autorizado" });
+  }
+};
+
 module.exports = {
   login,
   googleSignIn,
+  renewToken,
 };

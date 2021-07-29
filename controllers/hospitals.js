@@ -20,74 +20,74 @@ const createHospital = async (req, res = response) => {
     const hospitalCreated = await hospital.save();
     res.json({
       ok: true,
-      hospitalCreated
+      hospitalCreated,
     });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
 };
 
-// const updateUser = async (req, res = response) => {
-//   try {
-//     const uid = req.params.id;
+const updateHospital = async (req, res = response) => {
+  try {
+    const id = req.params.id; // Id del hospital
+    const uid = req.uid; // Id del usuario del al pasar por el jwtValidator
 
-//     const checkIfUser = await User.findById( uid );
-//     if (!checkIfUser) {
-//       return res.status(404).json({
-//         ok: false,
-//         error: "El usuario no está registrado",
-//       });
-//     }
+    const hospital = await Hospital.findById(id);
+    if (!hospital) {
+      return res.status(404).json({
+        ok: false,
+        error: "El hospital no está registrado",
+      });
+    }
 
-//     const { password, google, email, ...fields } = req.body;
-//     if (checkIfUser.email !== email) {
-//       const checkIfEmail = await User.findOne({ email });
-//       if (checkIfEmail) {
-//         return res.status(400).json({
-//           ok: false,
-//           error: "Email ya registrado",
-//         });
-//       }
-//     }
-//     fields.email = email;
-//     const userUpdated = await User.findByIdAndUpdate(uid, fields, {
-//       new: true,
-//     });
+    const newHospitalData = {
+      ...req.body,
+      user: uid,
+    };
 
-//     res.json({
-//       ok: true,
-//       userUpdated,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ ok: false, error: error.message });
-//   }
-// };
+    const hospitalUpdated = await Hospital.findByIdAndUpdate(
+      id,
+      newHospitalData,
+      {
+        new: true,
+      }
+    );
 
-// const deleteUser = async (req, res = response) => {
-//   try {
-//     const uid = req.params.id;
+    res.json({
+      ok: true,
+      hospitalUpdated,
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+};
 
-//     const checkIfUser = await User.findById( uid );
-//     if (!checkIfUser) {
-//       return res.status(404).json({
-//         ok: false,
-//         error: "El usuario no está registrado",
-//       });
-//     }
+const deleteHospital = async (req, res = response) => {
+  try {
+    const id = req.params.id;
+    
+    const hospital = await Hospital.findById(id);
+    if (!hospital) {
+      return res.status(404).json({
+        ok: false,
+        error: "El hospital no está registrado",
+      });
+    }
 
-//     await User.findByIdAndDelete( uid );
+    await Hospital.findByIdAndDelete(id);
 
-//     res.json({
-//       ok: true,
-//       msg: "Usuario eliminado correctamente.",
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({ ok: false, error: error.message });
-//   }
-// };
+    res.json({
+      ok: true,
+      data: "Hospital eliminado correctamente.",
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+};
 
 module.exports = {
   getHospitals,
   createHospital,
+  updateHospital,
+  deleteHospital,
 };
