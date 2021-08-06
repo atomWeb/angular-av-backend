@@ -1,18 +1,20 @@
 const { response } = require("express");
-const bcrypt = require("bcryptjs");
 const Doctor = require("../models/doctor");
-const { generateJwt } = require("../helpers/jwt");
 
 const getDoctors = async (req, res = response) => {
-  const doctors = await Doctor.find()
-    .populate("user", "username")
-    .populate("hospitals", "name");
+  try {
+    const doctors = await Doctor.find()
+      .populate("user", "username image")
+      .populate("hospitals", "name image");
 
-  res.json({
-    ok: true,
-    doctors,
-    // uid: req.uid // Muestra el usuario que ha hecho la peticion
-  });
+    res.json({
+      ok: true,
+      doctors,
+      // uid: req.uid // Muestra el usuario que ha hecho la peticion
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
 };
 
 const createDoctor = async (req, res = response) => {
@@ -62,7 +64,7 @@ const updateDoctor = async (req, res = response) => {
 const deleteDoctor = async (req, res = response) => {
   try {
     const id = req.params.id;
-    
+
     const doctor = await Doctor.findById(id);
     if (!doctor) {
       return res.status(404).json({
@@ -82,9 +84,26 @@ const deleteDoctor = async (req, res = response) => {
   }
 };
 
+const getDoctorById = async (req, res = response) => {
+  try {
+    const id = req.params.id;
+    const doctor = await Doctor.findById(id)
+      .populate("user", "username image")
+      .populate("hospitals", "name image");
+
+    res.json({
+      ok: true,
+      doctor,
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+};
+
 module.exports = {
   getDoctors,
   createDoctor,
   updateDoctor,
   deleteDoctor,
+  getDoctorById,
 };

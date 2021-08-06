@@ -5,7 +5,13 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 const { validateFields } = require("../middlewares/field-validations");
 const { jwtValidator } = require("../middlewares/jwt-validator");
-const { getDoctors, createDoctor, updateDoctor, deleteDoctor } = require("../controllers/doctors");
+const {
+  getDoctors,
+  createDoctor,
+  updateDoctor,
+  deleteDoctor,
+  getDoctorById,
+} = require("../controllers/doctors");
 
 const router = Router();
 
@@ -18,7 +24,7 @@ router.post(
     jwtValidator,
     check("name", "El nombre del doctor es obligatorio").not().isEmpty(),
     check("hospitals", "El hospital debe ser un id válido").isMongoId(), // No esta validado el array
-    validateFields
+    validateFields,
   ],
   createDoctor
 );
@@ -35,5 +41,7 @@ router.put(
 );
 
 router.delete("/:id", jwtValidator, deleteDoctor);
+
+router.get("/:id", jwtValidator, getDoctorById);
 
 module.exports = router;

@@ -13,7 +13,7 @@ const getUsers = async (req, res) => {
   // const total = await User.countDocuments();
 
   const [users, total] = await Promise.all([
-    User.find({}, "username email role")
+    User.find({}, "username email image google role uid")
         .skip(tokenpag)
         .limit(5),
     User.countDocuments()
@@ -49,9 +49,8 @@ const createUser = async (req, res = response) => {
     const token = await generateJwt(user.id);
 
     res.json({
-      ok: true,
-      user,
-      token,
+      ok: true,      
+      data: token,
     });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
@@ -80,14 +79,18 @@ const updateUser = async (req, res = response) => {
         });
       }
     }
-    fields.email = email;
+
+    if (!checkIfUser.google) {
+	fields.email = email;
+    }    
+
     const userUpdated = await User.findByIdAndUpdate(uid, fields, {
       new: true,
     });
 
     res.json({
       ok: true,
-      userUpdated,
+      data: userUpdated,
     });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });

@@ -72,9 +72,12 @@ const renewToken = async (req, res = response) => {
   try {
     const uid = req.uid;
     const token = await generateJwt(uid);
+    const userDb = await User.findById(uid);  
+
     res.json({
       ok: true,
       data: token,
+      user: userDb,
     });
   } catch (error) {
     console.log(error.message);
