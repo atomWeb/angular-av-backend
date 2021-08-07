@@ -1,13 +1,14 @@
 const { response } = require("express");
 const bcrypt = require("bcryptjs");
 const { generateJwt } = require("../helpers/jwt");
+const { getMenuFrontEnd } = require("../helpers/menu-frontend");
 const { verify } = require("../helpers/google-verify");
 const User = require("../models/user");
 
 const login = async (req, res = response) => {
   const { email, password } = req.body;
 
-  const checkIfEmail = await User.findOne({ email });
+  const checkIfEmail = await User.findOne({ email }); //checkIfEmail es el usuario
   if (!checkIfEmail) {
     return res.status(404).json({
       ok: false,
@@ -29,6 +30,7 @@ const login = async (req, res = response) => {
     res.json({
       ok: true,
       data: token,
+      menu: getMenuFrontEnd(checkIfEmail.role),
     });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
@@ -61,6 +63,7 @@ const googleSignIn = async (req, res = response) => {
     res.json({
       ok: true,
       data: token,
+      menu: getMenuFrontEnd(user.role),
     });
   } catch (error) {
     console.log(error.message);
@@ -72,12 +75,13 @@ const renewToken = async (req, res = response) => {
   try {
     const uid = req.uid;
     const token = await generateJwt(uid);
-    const userDb = await User.findById(uid);  
+    const userDb = await User.findById(uid);
 
     res.json({
       ok: true,
       data: token,
       user: userDb,
+      menu: getMenuFrontEnd(userDb.role),
     });
   } catch (error) {
     console.log(error.message);
